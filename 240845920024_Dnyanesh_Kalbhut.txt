@@ -1,0 +1,99 @@
+
+
+ ----------------------------------------------------------Section-A---------------------------------------------------------
+
+question:1 = 
+ CREATE TABLE LOG (
+    _id INT AUTO_INCREMENT PRIMARY KEY,
+    message VARCHAR(40) NOT NULL,
+    message_date DATE UNIQUE
+);
+
+question no:2 =
+SELECT ename
+FROM emp
+WHERE sal = (
+    SELECT DISTINCT sal
+    FROM emp
+    ORDER BY sal DESC
+    LIMIT 1 OFFSET 1
+); 
+
+question no:3=
+SELECT *
+FROM emp
+WHERE sal * 1.25 > 3000;
+
+question:4 = 
+SELECT *
+FROM emp
+WHERE ename LIKE 'S%' AND LENGTH(ename) > 6;
+
+question:5=
+ SELECT * FROM emp
+ WHERE empno%2=1;
+
+question:6=
+SELECT d.DNAME
+FROM dept d
+WHERE d.DEPTNO NOT IN (
+    SELECT DISTINCT e.DEPTNO
+    FROM emp e
+    WHERE e.JOB = 'MANAGER'
+);
+
+question: 7=
+ SELECT ename FROM emp
+ WHERE LENGTH(ename) = 6;
+
+question: 8 =
+CREATE INDEX idx_job
+ON emp (job);
+
+question: 9 =
+CREATE TABLE x AS
+SELECT *
+FROM emp;
+
+quesrion:10 =
+SELECT 
+CONCAT('******', RIGHT(phone, 4)) 
+FROM 
+emp;
+
+
+
+-------------------------------------------------------------Section-B-------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS pro1;
+DELIMITER $
+
+CREATE PROCEDURE pro1(IN salary INT)
+BEGIN
+    DECLARE e_ename VARCHAR(20);
+    DECLARE e_job VARCHAR(15);
+    DECLARE e_hiredate DATE;
+    DECLARE e_sal INT;
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE c1 CURSOR FOR SELECT ename, job, hiredate, sal FROM emp WHERE sal < salary;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN c1;
+
+    l: LOOP
+        FETCH c1 INTO e_ename, e_job, e_hiredate, e_sal;
+        IF done THEN
+            LEAVE l;
+        END IF;
+        SELECT e_ename, e_job, e_hiredate, e_sal;
+    END LOOP l;
+
+    CLOSE c1;
+END $
+
+DELIMITER ;
+
+
+call pro1(1750);
+
